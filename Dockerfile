@@ -1,12 +1,13 @@
-# 1. 자바 실행 환경 설정
-FROM eclipse-temurin:17-jdk-jammy
-
-# 2. 작업 디렉토리 설정
+# 1단계: 빌드용 이미지 (Gradle 사용)
+FROM gradle:7.6-jdk17 AS build
 WORKDIR /app
+COPY . .
+RUN ./gradlew bootJar --no-daemon
 
-# 3. 빌드된 jar 파일을 복사 (gradle 기준)
-# 만약 파일 이름이 다르면 build/libs/*.jar 부분을 확인해야 합니다.
-COPY build/libs/*.jar app.jar
-
-# 4. 서버 실행
+# 2단계: 실행용 이미지
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+# 빌드된 jar 파일을 복사
+COPY --from=build /app/build/libs/*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
