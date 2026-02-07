@@ -10,6 +10,7 @@
         #calendar-table td { width: 14.28%; height: 90px; vertical-align: top; padding: 5px; border: 1px solid #eee; position: relative; }
         .diary-link { background: #e7f1ff; color: #007bff; border-radius: 4px; padding: 2px 5px; font-size: 0.75rem; display: block; margin-top: 4px; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 1px solid #cce5ff; }
         .diary-link:hover { background: #d1e7ff; }
+        .btn-move { border: none; background: none; font-size: 1.5rem; cursor: pointer; color: #007bff; }
 
         /* 방명록 스타일 */
         #guest-bubble-btn { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: #007bff; color: white; border-radius: 50%; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.2s; }
@@ -40,7 +41,12 @@
     <h1 class="text-center mb-5">🗓️ 2026 My Diary</h1>
 
     <div class="calendar-container mb-5">
-        <h3 id="calendar-title" class="text-center mb-4">2026년 2월</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn-move" onclick="changeMonth(-1)">◀</button>
+            <h3 id="calendar-title" class="mb-0">2026년 2월</h3>
+            <button class="btn-move" onclick="changeMonth(1)">▶</button>
+        </div>
+
         <table class="table mb-0" id="calendar-table">
             <thead>
             <tr class="table-light text-center">
@@ -56,9 +62,7 @@
         <h5 class="mb-3">✍️ 오늘 기록하기</h5>
         <form action="/save" method="post" enctype="multipart/form-data">
             <input type="text" name="title" class="form-control mb-2" placeholder="제목" required>
-
             <input type="file" name="file" class="form-control mb-2">
-
             <textarea name="content" class="form-control mb-2" rows="3" placeholder="어떤 일이 있었나요?" required></textarea>
             <button type="submit" class="btn btn-primary w-100">일기 저장하기</button>
         </form>
@@ -98,50 +102,60 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const diaries = [[${list}]]; // 서버에서 일기 목록 가져오기
+    const diaries = [[${list}]];
+    let currentYear = 2026;
+    let currentMonth = 1; // 0이 1월, 1이 2월
 
     function renderCalendar() {
         const tbody = document.getElementById('calendar-body');
-        tbody.innerHTML = ''; // 기존 내용 지우기
+        const title = document.getElementById('calendar-title');
+        tbody.innerHTML = '';
+
+        title.innerText = `${currentYear}년 ${currentMonth + 1}월`;
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
 
         let date = 1;
-        // 2026년 2월 달력 (28일까지) 그리기
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 6; i++) {
             let row = document.createElement('tr');
+            let hasDate = false;
+
             for (let j = 0; j < 7; j++) {
                 let cell = document.createElement('td');
-                if (date <= 28) {
+                if ((i === 0 && j >= firstDay) || (i > 0 && date <= lastDate)) {
                     cell.innerHTML = `<strong>${date}</strong>`;
-                    const fullDate = `2026-02-${String(date).padStart(2, '0')}`;
+                    const fullDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 
-                    // 해당 날짜에 일기가 있는지 확인
                     if (diaries) {
                         diaries.forEach(d => {
                             if (d.createdAt && d.createdAt.split('T')[0] === fullDate) {
-                                // ⭐ 상세 페이지(/diary/번호)로 연결되는 링크 추가
                                 cell.innerHTML += `<a href="/diary/${d.id}" class="diary-link">${d.title}</a>`;
                             }
                         });
                     }
                     date++;
+                    hasDate = true;
                 }
                 row.appendChild(cell);
             }
+            if (!hasDate && i > 0) break;
             tbody.appendChild(row);
         }
     }
 
-    // 방명록 창 끄고 켜기
-    function toggleGuestWindow() {
-        const win = document.getElementById('guest-window');
-        if (win.style.display === 'flex') {
-            win.style.display = 'none';
-        } else {
-            win.style.display = 'flex';
-        }
+    function changeMonth(diff) {
+        currentMonth += diff;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
     }
 
-    // 페이지 로드 시 달력 그리기 실행
+    function toggleGuestWindow() {
+        const win = document.getElementById('guest-window');
+        win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+    }
+
     window.onload = function() {
         renderCalendar();
     };
