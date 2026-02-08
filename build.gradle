@@ -11,12 +11,28 @@ java { sourceCompatibility = '17' }
 repositories { mavenCentral() }
 
 dependencies {
+    // 타임리프 및 웹 설정
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // 데이터베이스(JPA) 관련
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // ⭐ Supabase(PostgreSQL) 연결을 위한 핵심 부품!
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // 테스트용 H2 (남겨두셔도 무방합니다)
     runtimeOnly 'com.h2database:h2'
+
+    // 롬복(Lombok)
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // 보안(Security) 관련
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
