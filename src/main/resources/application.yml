@@ -7,22 +7,19 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
-  # ⭐ 여기서부터 Supabase 연결 설정입니다
   datasource:
     url: jdbc:postgresql://db.yaoewmsebqbvdhrcorfq.supabase.co:5432/postgres
     username: postgres
-    password: kim7740 # 꼭 직접 만드신 비번을 적어주세요!
+    password: KKimsuhyun1!
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update # 이게 있어야 Supabase에 자동으로 표가 생깁니다!
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-  # H2 관련 설정은 이제 필요 없어서 삭제해도 됩니다.
 
   mvc:
     static-path-pattern: /uploads/**
