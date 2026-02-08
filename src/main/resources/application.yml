@@ -8,9 +8,10 @@ spring:
       max-request-size: 10MB
 
   datasource:
-    url: jdbc:postgresql://db.yaoewmsebqbvdhrcorfq.supabase.co:5432/postgres
-    username: postgres
-    password: KKimsuhyun1!
+    # Render 환경 변수값을 가져오도록 설정
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -20,12 +21,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
   mvc:
     static-path-pattern: /uploads/**
   web:
     resources:
-      static-locations: classpath:/static/, file:./src/main/resources/static/
+      static-locations: classpath:/static/, file:src/main/resources/static/
 
 file:
   upload-dir: uploads
