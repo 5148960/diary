@@ -11,7 +11,7 @@ spring:
   datasource:
     url: jdbc:postgresql://db.yaoewmsebqbvdhrcorfq.supabase.co:5432/postgres
     username: postgres
-    password: [본인이 설정한 비밀번호] # 꼭 직접 만드신 비번을 적어주세요!
+    password: kim7740 # 꼭 직접 만드신 비번을 적어주세요!
     driver-class-name: org.postgresql.Driver
 
   jpa:
